@@ -1,83 +1,93 @@
-
-
-
-def user_digit():
-    while True:
-        try:
-            num1= int(input("Insert the first digit.\n"))
-            num2= int(input("Insert the second digit.\n"))
-            return num1,num2
-        except ValueError:
-            print("Error: Insert a number.")
-
-            
-def instructions():
-    print("INSTRUCTIONS:\n")
-    explanations = "Addition : +\nSubraction : -\nMultiplication : *\nDivision : /\nExponential : **\nRemainder : %\n"
-    print(explanations)
-
-
-def user_operator():
-    user_sign= ["+","-","*","/","**","%"]
-    while True:
-        user_choice= input("Insert the operator you want to use.\n")
-        if user_choice not in user_sign:
-            print("Error: Insert valid operator.")
-        else:
-            return user_choice
-        
-
-def addition(num1,num2):
-    addition = num1+ num2
-    print(addition)
-
-
-def subtraction(num1,num2):
-    subtract= num1-num2
-    print(subtract)
-
-
-def multiplication(num1,num2):
-    multiply= num1*num2
-    print(multiply)
-
-
-def division(num1,num2):
-    divide = num1/num2
-    print(divide)
-
-
-def exponential(num1,num2):
-    exponent= num1 ** num2
-    print(exponent)
-
-def remainder(num1,num2):
-    remain= num1%num2
-    print(remain)
-
-
-def run_sums(operator,num1,num2):
+class Calculator:
     
-    if operator == "+":
-        addition(num1,num2)
-    elif operator == "-":
-        subtraction(num1,num2)
-    elif operator == "/":
-        division(num1,num2)
-    elif operator == "**":
-        exponential(num1,num2)
-    elif operator == "%":
-        remainder(num1,num2)
+    OPERATORS = {
+        '+': lambda x, y: x + y,
+        '-': lambda x, y: x - y,
+        '*': lambda x, y: x * y,
+        '/': lambda x, y: x / y if y != 0 else None,
+        '**':lambda x, y: x ** y,
+        '%': lambda x, y: x % y if y != 0 else None
+    }
+
+    @staticmethod
+    def get_number_input(prompt):
+        """Get numerical input from user with error handling."""
+        while True:
+            try:
+                return float(input(prompt))
+            except ValueError:
+                print("Error: Please enter a valid number.")
+
+    @classmethod
+    def get_operator(cls):
+        """Get operator input from user with validation."""
+        while True:
+            operator = input("Enter the operator (+, -, *, /, **, %): ").strip()
+            if operator in cls.OPERATORS:
+                return operator
+            print(f"Error: Please enter a valid operator from {', '.join(cls.OPERATORS.keys())}")
+
+    @staticmethod
+    def display_instructions():
+        """Display calculator instructions."""
+        print("\n=== Calculator Instructions ===")
+        print("Available operations:")
+        print("  + : Addition")
+        print("  - : Subtraction")
+        print("  * : Multiplication")
+        print("  / : Division")
+        print("  ** : Exponentiation")
+        print("  % : Modulus (Remainder)")
+        print("========================\n")
+
+    @classmethod
+    def calculate(cls, num1, num2, operator):
+        """Perform calculation and handle edge cases."""
+        if operator in ['/', '%'] and num2 == 0:
+            return None, "Error: Division by zero!"
+        
+        try:
+            result = cls.OPERATORS[operator](num1, num2)
+            return result, None
+        except Exception as e:
+            return None, f"Error: {str(e)}"
+
+    def run(self):
+        """Main calculator loop."""
+        print("Welcome to Inathi's Advanced Calculator!")
+        
+        while True:
+            self.display_instructions()
+            num1 = self.get_number_input("Enter the first number: ")
+            num2 = self.get_number_input("Enter the second number: ")
+            operator = self.get_operator()
+            
+            result, error = self.calculate(num1, num2, operator)
+            
+            if error:
+                print(error)
+            else:
+                print(f"\nResult: {num1} {operator} {num2} = {result}")
+    
+                if result.is_integer():
+                    print(f"(Integer result: {int(result)})")
+
+
+            if not input("\nContinue? (y/n): ").lower().startswith('y'):
+                print("Thank you for using the calculator. Goodbye!")
+                break
+
+
+def main():
+    """Entry point of the calculator program."""
+    try:
+        calculator = Calculator()
+        calculator.run()
+    except KeyboardInterrupt:
+        print("\nCalculator terminated by user.")
+    except Exception as e:
+        print(f"An unexpected error occurred: {str(e)}")
+
 
 if __name__ == "__main__":
-    while True:
-        num1,num2=user_digit()
-        instructions()
-        operator=user_operator()
-        run_sums(operator,num1,num2)
-        progress= input("Do you want to do more sums? Insert Yes or No.\n").lower()
-        if progress == "yes":
-            print("Welcome back.")
-        else:
-            print("Goodbye.")
-            break
+    main()
